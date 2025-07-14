@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Grafo de Materias</title>
+  <script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+  <style>
+    #network { width: 100vw; height: 90vh; border: 1px solid lightgray; }
+  </style>
+</head>
+<body>
+  <h2>Grafo de Materias y Prerrequisitos</h2>
+  <div id="network"></div>
+  <script>
+    // Copia aquí tu arreglo de materias
+    const materias = [
+      { id: "anatomia", nombre: "Anatomía" },
+      { id: "biologia", nombre: "Biología" },
+      { id: "citologia", nombre: "Citología, Histología y Embriología" },
+      { id: "csociales", nombre: "Ciencias Sociales y Medicina" },
+      { id: "infobasica", nombre: "Informática Básica" },
+      { id: "fisifibio", nombre: "Fisiología y Física Biológica", prereqs: ["anatomia","biologia","citologia"] },
+      { id: "bioquim", nombre: "Bioquímica y Biología Molecular", prereqs: ["biologia"] },
+      { id: "epid", nombre: "Epidemiología", prereqs: ["csociales"] },
+      { id: "psicmed", nombre: "Psicología Médica", prereqs: ["anatomia"] },
+      { id: "farmaco", nombre: "Farmacología Básica", prereqs: ["fisifibio","bioquim"] },
+      { id: "microbio", nombre: "Microbiología y Parasitología", prereqs: ["fisifibio","bioquim"] },
+      { id: "patologia", nombre: "Patología", prereqs: ["anatomia","fisifibio","bioquim"] },
+      { id: "semiologia", nombre: "Semiología", prereqs: ["anatomia","fisifibio","bioquim"] },
+      { id: "cirugia1", nombre: "Cirugía I", prereqs: ["farmaco","patologia","semiologia"] },
+      { id: "medint1", nombre: "Medicina Interna I", prereqs: ["farmaco","microbio","patologia","semiologia"] },
+      { id: "cirugia2", nombre: "Cirugía II", prereqs: ["cirugia1"] },
+      { id: "medint2", nombre: "Medicina Interna II", prereqs: ["farmaco","microbio","patologia","semiologia"] },
+      { id: "pfo", nombre: "Práctica Final Obligatoria", prereqs: ["cirugia2","medint2"] }
+    ];
+
+    // Crear nodos
+    const nodes = materias.map(m => ({
+      id: m.id,
+      label: m.nombre
+    }));
+
+    // Crear aristas (edges)
+    const edges = [];
+    materias.forEach(m => {
+      if (m.prereqs) {
+        m.prereqs.forEach(pr => {
+          edges.push({ from: pr, to: m.id });
+        });
+      }
+    });
+
+    // Inicializar el grafo
+    const container = document.getElementById('network');
+    const data = { nodes: new vis.DataSet(nodes), edges: new vis.DataSet(edges) };
+    const options = {
+      layout: { hierarchical: { direction: 'UD', sortMethod: 'directed' } },
+      edges: { arrows: 'to' },
+      physics: false
+    };
+    new vis.Network(container, data, options);
+  </script>
+</body>
+</html>
